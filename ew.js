@@ -5,6 +5,7 @@ const targz = require('targz');
 
 if (!isRoot) return console.log("You must be root to excecute this command!");
 if (!fs.existsSync("/etc/ew")) fs.mkdirSync("/etc/ew");
+if (!fs.existsSync("/etc/ew/installed")) fs.mkdirSync("/etc/ew/installed");
 //if (fs.existsSync("/etc/ew/lock")) return console.log("/etc/ew/lock exists, cancelling.");
 //fs.writeFileSync('/etc/ew/lock', 'ew package manager lock\n');
 //console.log("Created lock file.");
@@ -32,6 +33,8 @@ function install(package) {
         process.stdout.write("Done!\n");
     });
     console.log("Installed ${package}!");
+    fs.unlinkSync(`/tmp/${package}.ew.tar.gz`)
+    download(`https://ew.cumbox.best/packageInfo/${package}.json`, '/etc/ew/installed');
 };
 
 function uninstall(package) {
