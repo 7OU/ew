@@ -1,7 +1,6 @@
 const isRoot = process.getuid && process.getuid() === 0;
 const fs = require('fs');
 const download = require('download');
-const { exec } = require('child_process');
 const targz = require('targz');
 
 if (!isRoot) return console.log("You must be root to excecute this command!");
@@ -30,7 +29,6 @@ function install(package) {
     process.stdout.write(`Downloading ${package}`);
     download(packageURL, '/tmp').then(() => {
         targz.decompress({ src: `/tmp/${package}.ew.tar.gz`, dest: '/' });
-//        exec(`tar xzvf /tmp/${package}.ew.tar.gz -C /`);
     });
 };
 
