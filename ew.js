@@ -1,6 +1,6 @@
 const isRoot = process.getuid && process.getuid() === 0;
 const fs = require('fs');
-const download = require('download');
+const download = require('download-file');
 const targz = require('targz');
 
 if (!isRoot) return console.log("You must be root to excecute this command!");
