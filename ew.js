@@ -28,13 +28,14 @@ function install(package) {
     var packageURL = packageList[package]
     console.log(packageURL);
     process.stdout.write(`Downloading ${package}... `);
-    download(packageURL, '/tmp').then(() => {
-        targz.decompress({ src: `/tmp/${package}.ew.tar.gz`, dest: '/' });
+    download(packageURL, { directory: "/tmp", filename: `${package}.ew.tar.gz` }, function(){
+        targz.decompress({ src: `/tmp/${package}.ew.tar.gz`, dest: '/'}, function(){
+            fs.unlinkSync(`/tmp/${package}.ew.tar.gz`);
+        });
         process.stdout.write("Done!\n");
+        console.log(`Installed ${package}!`);
     });
-    console.log("Installed ${package}!");
-    fs.unlinkSync(`/tmp/${package}.ew.tar.gz`)
-    download(`https://ew.cumbox.best/packageInfo/${package}.json`, '/etc/ew/installed');
+    download(`https://ew.cumbox.best/packageInfo/${package}.json`, { directory: "/etc/ew/installed", filename: `${package}.json` });
 };
 
 function uninstall(package) {
