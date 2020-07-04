@@ -1,0 +1,7 @@
+ if (process.argv[3] === null) return console.log("please specify a package. returning....");
+    console.log(`removing ${package}....`);
+    if(!fs.existsSync(`/etc/ew/archive/${package}`)) return console.log("error, archive not found");
+    fs.renameSync(`/etc/ew/archive/${package}`, `/tmp/${package}.ew.tar.gz`);
+    targz.decompress({ src: `/tmp/${package}.ew.tar.gz`, dest: '/tmp/'});
+    //this is where it gets tricky
+    let installed = fs.readdirSync(`/tmp/${package}`);
