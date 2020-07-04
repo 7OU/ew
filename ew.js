@@ -8,6 +8,11 @@ if (!fs.existsSync("/etc/ew")) fs.mkdirSync("/etc/ew");
 if (!fs.existsSync("/etc/ew/installed")) fs.mkdirSync("/etc/ew/installed");
 //make an archive to help with other functions
 if (!fs.existsSync("/etc/ew/archive")) fs.mkdirSync("/etc/ew/archive");
+if (!fs.existsSync("/etc/ew/source")) {
+    fs.mkdirSync("/etc/ew/source");
+    fs.writeFileSync("/etc/ew/sources.list");
+}
+
 //if (fs.existsSync("/etc/ew/lock")) return console.log("/etc/ew/lock exists, cancelling.");
 //fs.writeFileSync('/etc/ew/lock', 'ew package manager lock\n');
 //console.log("Created lock file.");
@@ -19,6 +24,8 @@ if (!fs.existsSync("/etc/ew/packages.json")) {
 if (process.argv[2] === '-r') updatePackageList();
 if (process.argv[2] === '-i') install(process.argv[3]);
 if (process.argv[2] === '-u') uninstall(process.argv[3]);
+if (process.argv[2] === '-a') addsrc(process.argv[3]);
+if (process.argv[2] === '-h') help();
 
 function updatePackageList() {
     process.stdout.write("Updating package list... ");
@@ -27,6 +34,16 @@ function updatePackageList() {
         process.stdout.write("Done!\n");
     });
 };
+
+function help() {
+    console.log("here are the list of commands available for ew package manager:");
+    console.log(" ");
+    console.log("-r: reload package list");
+    console.log("-i: installs a package");
+    console.log("-u: uninstalls a package");
+    console.log("-a: add a source");
+    console.log("-h: prints list of commands");
+}
 
 function install(package) {
     var packageList = require("/etc/ew/packages.json");
@@ -53,4 +70,7 @@ function uninstall(package) {
     return console.log("uninstall is not finished yet.");
 }
 
+function addsrc(src) {
+    return console.log("this function is unfinished");
+}
 //fs.unlinkSync('/etc/ew/lock');
