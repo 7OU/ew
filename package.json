@@ -4,8 +4,8 @@
   "description": "The worlds first Linux package manager in JavaScript.",
   "main": "ew.js",
   "scripts": {
-    "build": "pkg -t node13-linux-x64 mednafencli.js",
-    "install": "chmod +x mednafencli && mv mednafencli /usr/bin"
+    "build": "pkg -t node13-linux-x64 ew.js",
+    "install": "chmod +x ew && mv ew /usr/bin"
   },
   "repository": {
     "type": "git",
