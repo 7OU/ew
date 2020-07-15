@@ -1,26 +1,26 @@
 {
-  "name": "ew",
-  "version": "0.0.1",
-  "description": "The worlds first Linux package manager in JavaScript.",
-  "main": "ew.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/7OU/ew.git"
-  },
-  "author": "Evan & Matt",
-  "license": "AGPL-3.0",
-  "bugs": {
-    "url": "https://github.com/7OU/ew/issues"
-  },
-  "homepage": "https://github.com/7OU/ew#readme",
-  "dependencies": {
-    "download-file": "^0.1.5",
-    "fs": "0.0.1-security",
-    "fs-extra": "^9.0.1",
-    "rimraf": "^3.0.2",
-    "targz": "^1.0.1"
-  }
+    "name": "ew",
+    "version": "0.0.1",
+    "description": "The worlds first Linux package manager in JavaScript.",
+    "main": "ew.js",
+    "scripts": {
+        "build": "pkg -t node13-linux-x64 ew.js",
+        "install": "chmod +x ew && mv ew /usr/bin"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/7OU/ew.git"
+    },
+    "author": "Evan & Matt",
+    "license": "AGPL-3.0",
+    "bugs": {
+        "url": "https://github.com/7OU/ew/issues"
+    },
+    "homepage": "https://github.com/7OU/ew#readme",
+    "dependencies": {
+        "download-file": "^0.1.5",
+        "fs-extra": "^9.0.1",
+        "rimraf": "^3.0.2",
+        "targz": "^1.0.1"
+    }
 }
