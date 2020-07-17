@@ -81,7 +81,7 @@ function uninstall(package) {
         newfile = newfile.replace(/[\[\]"]/g, "");
         fs.removeSync(newfile);
     }
-    process.stdout.write("done!");
+    process.stdout.write("done!\n");
     console.log(`successfully uninstalled ${package}`);
 }
 
