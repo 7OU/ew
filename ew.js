@@ -54,13 +54,9 @@ function install(package) {
             let json = require(`/etc/ew/installed/${package}.json`);
             if (json["depends"]) {
                 let dependscount = json.depends.length;
-                if (dependscount === 1) {
-                    console.log("this package requires " + dependscount + " dependency, installing now...");
-                } else if (dependscount === 0) {
-                    return console.log("Warning: json file has a depends field, but its empty.");
-                } else {
-                    console.log("this package requires" + dependscount + "dependencies");
-                }
+                if (dependscount === 1) console.log("this package requires " + dependscount + " dependency, installing now...");
+                else if (dependscount === 0) return console.log("Warning: json file has a depends field, but its empty.");
+                else console.log("this package requires" + dependscount + "dependencies");
                 for (let dependencies = json.depends; dependscount > 0; dependscount--) {
                     dependencies = JSON.stringify(dependencies);
                     dependencies = dependencies.replace(/[\[\]"]/g, "")
@@ -79,12 +75,14 @@ function uninstall(package) {
     if (!fs.existsSync(`/etc/ew/installed/${package}.json`) && !fs.existsSync(`/etc/ew/archive/${package}.ew.tar.gz`)) return console.log("package already removed!");
     let json = require(`/etc/ew/installed/${package}.json`);
     let directories = json.directoriesToDelete;
-    let directorycount = directories.length
+    let directorycount = directories.length;
     for (let file = directories; directorycount > 0; directorycount--) {
         let newfile = JSON.stringify(file);
         newfile = newfile.replace(/[\[\]"]/g, "");
         fs.removeSync(newfile);
     }
+    process.stdout.write("done!");
+    console.log(`successfully uninstalled ${package}`);
 }
 
 function addsrc(src) {
