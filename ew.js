@@ -25,7 +25,6 @@ if (process.argv[2] === '-i') install(process.argv[3]);
 if (process.argv[2] === '-u') uninstall(process.argv[3]);
 if (process.argv[2] === '-a') addsrc(process.argv[3]);
 if (process.argv[2] === '-h') help();
-if (process.argv[2] === '-l') update();
 
 function updatePackageList() {
     process.stdout.write("Updating package list... ");
@@ -43,7 +42,6 @@ function help() {
     console.log("-u: uninstalls a package");
     console.log("-a: add a source");
     console.log("-h: prints list of commands");
-    console.log("-l: update ew");
 }
 
 function install(package) {
@@ -92,5 +90,4 @@ function uninstall(package) {
 function addsrc(src) {
     return console.log("this function is unfinished");
 }
-
 //fs.unlinkSync('/etc/ew/lock');
