@@ -49,13 +49,26 @@ function help() {
 function install(package) {
     var packageList = require("/etc/ew/packages.json");
     var packageURL = packageList[package];
-    console.log(packageURL);
     process.stdout.write(`Downloading ${package}... `);
     download(packageURL, { directory: "/tmp", filename: `${package}.ew.tar.gz` }, function() {
         targz.decompress({ src: `/tmp/${package}.ew.tar.gz`, dest: '/' }, function() {
-
             fs.unlinkSync(`/tmp/${package}.ew.tar.gz`);
-
+            let json = require(`/etc/ew/installed/${package}.json`);
+            if (json["depends"]) {
+                let dependscount = json.depends.length;
+                if (dependscount === 1) {
+                    console.log("this package requires " + dependscount + " dependency, installing now...");
+                } else if (dependscount === 0) {
+                    return console.log("Warning: json file has a depends field, but its empty.");
+                } else {
+                    console.log("this package requires" + dependscount + "dependencies");
+                }
+                for (let dependencies = json.depends; dependscount > 0; dependscount--) {
+                    dependencies = JSON.stringify(dependencies);
+                    dependencies = dependencies.replace(/[\[\]"]/g, "")
+                    install(dependencies);
+                }
+            }
         });
         process.stdout.write("Done!\n");
         console.log(`Installed ${package}!`);
@@ -68,19 +81,15 @@ function uninstall(package) {
     if (!fs.existsSync(`/etc/ew/installed/${package}.json`) && !fs.existsSync(`/etc/ew/archive/${package}.ew.tar.gz`)) return console.log("package already removed!");
     let json = require(`/etc/ew/installed/${package}.json`);
     let directories = json.directoriesToDelete;
-    let directorycount = directories.length;
+    let directorycount = directories.length
     for (let file = directories; directorycount > 0; directorycount--) {
         let newfile = JSON.stringify(file);
         newfile = newfile.replace(/[\[\]"]/g, "");
         fs.removeSync(newfile);
     }
-    fs.unlinkSync(`/etc/ew/installed/${package}.json`);
-    process.stdout.write(`done!\n`);
-    process.stdout.write(`Successfully  uninstalled ${package}!\n`);
-}
 
-function addsrc(src) {
-    return console.log("this function is unfinished");
-}
+    function addsrc(src) {
+        return console.log("this function is unfinished");
+    }
 
-//fs.unlinkSync('/etc/ew/lock');
+    //fs.unlinkSync('/etc/ew/lock');
