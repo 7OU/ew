@@ -87,9 +87,10 @@ function uninstall(package) {
         newfile = newfile.replace(/[\[\]"]/g, "");
         fs.removeSync(newfile);
     }
+}
 
-    function addsrc(src) {
-        return console.log("this function is unfinished");
-    }
+function addsrc(src) {
+    return console.log("this function is unfinished");
+}
 
-    //fs.unlinkSync('/etc/ew/lock');
+//fs.unlinkSync('/etc/ew/lock');
