@@ -20,6 +20,7 @@
     "dependencies": {
         "download-file": "^0.1.5",
         "fs-extra": "^9.0.1",
+        "pkg": "^4.4.9",
         "targz": "^1.0.1"
     }
 }

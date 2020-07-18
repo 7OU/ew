@@ -72,7 +72,7 @@ function install(package) {
 
 function uninstall(package) {
     process.stdout.write(`removing ${package}....`);
-    if (!fs.existsSync(`/etc/ew/installed/${package}.json`) && !fs.existsSync(`/etc/ew/archive/${package}.ew.tar.gz`)) return console.log("package already removed!");
+    if (!fs.existsSync(`/etc/ew/installed/${package}.json`)) return console.log("package already removed!");
     let json = require(`/etc/ew/installed/${package}.json`);
     let directories = json.directoriesToDelete;
     let directorycount = directories.length;
