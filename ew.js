@@ -51,7 +51,8 @@ function install(package) {
     download(packageURL, { directory: "/tmp", filename: `${package}.ew.tar.gz` }, function() {
         targz.decompress({ src: `/tmp/${package}.ew.tar.gz`, dest: '/' }, function() {
             fs.unlinkSync(`/tmp/${package}.ew.tar.gz`);
-            let json = require(`/etc/ew/installed/${package}.json`);
+            var jsondata = fs.readFileSync(`/etc/ew/installed/${package}.json`);
+            var json = JSON.parse(jsondata);
             if (json["depends"]) {
                 let dependscount = json.depends.length;
                 if (dependscount === 1) console.log("this package requires " + dependscount + " dependency, installing now...");
@@ -65,7 +66,7 @@ function install(package) {
             }
         });
         process.stdout.write("Done!\n");
-        console.log(`Installed ${package}!`);
+        process.stdout.write(`Installed ${package}!\n`);
     });
     download(`https://ew.cumbox.best/packageInfo/${package}.json`, { directory: "/etc/ew/installed", filename: `${package}.json` });
 };
