@@ -19,6 +19,7 @@ if (process.argv[2] === '-i') install(process.argv[3]);
 if (process.argv[2] === '-u') uninstall(process.argv[3]);
 if (process.argv[2] === '-h') help();
 if (process.argv[2] === '-re') removeew();
+if (!process.argv[2]) updatePackageList();
 
 function updatePackageList() {
     process.stdout.write("Updating package list... ");
