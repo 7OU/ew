@@ -74,15 +74,4 @@ function uninstall(package) {
     process.stdout.write(`done!\n`);
     process.stdout.write(`Successfully  uninstalled ${package}!\n`);
 }
-
-function removeew() {
-    process.stdout.write("removing ewpm...\n");
-    if (fs.existsSync(`/etc/ew/installed/*.json`)) return console.log("Warning: you have packages installed, please remove them");
-    if (fs.existsSync(`/etc/ew/`)) console.log("ew dir has been found");
-    if (fs.existsSync(`/etc/ew/packages.json`)) fs.removeSync("/etc/ew/packages.json");
-    if (fs.existsSync("/etc/ew/archive")) fs.removeSync("/etc/ew/archive");
-    if (fs.existsSync("/etc/ew/source/sources.list")) fs.removeSync("/etc/ew/source/sources.list");
-    if (fs.existsSync("/etc/ew/source")) fs.removeSync("/etc/ew/source");
-    return console.log("ewpm has been successfully removed!");
-}
 //fs.unlinkSync('/etc/ew/lock');
