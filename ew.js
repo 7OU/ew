@@ -34,14 +34,8 @@ function updatePackageList() {
 };
 
 function help() {
-    console.log("here are the list of commands available for ew package manager:");
-    console.log(" ");
-    console.log("-r: reload package list");
-    console.log("-i: installs a package");
-    console.log("-u: uninstalls a package");
-    console.log("-h: prints list of commands");
+    console.log("here are the list of commands available for ew package manager:\n \n -r: reload package list\n -i: installs a package\n -u: uninstalls a package\n -h: prints list of commands\n");
 }
-
 function install(package) {
     var packageList = require("/etc/ew/packages.json");
     var packageURL = packageList[package]
