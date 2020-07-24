@@ -107,3 +107,4 @@ build/
 
 # binary
 ew
+.DS_Store
