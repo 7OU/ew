@@ -19,7 +19,9 @@
     "homepage": "https://github.com/7OU/ew#readme",
     "dependencies": {
         "download-file": "^0.1.5",
+        "download-file-sync": "^1.0.4",
         "fs-extra": "^9.0.1",
+        "minimist": "^1.2.5",
         "pkg": "^4.4.9",
         "targz": "^1.0.1"
     }
