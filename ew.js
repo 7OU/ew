@@ -19,7 +19,7 @@ if (!fs.exists("/etc/ew/packages.json")) {
 
 switch(process.argv[2]) {
     case ('-r'): updatePackageList();
-    case (-'i'): install(process.argv[3]);
+    case ('-i'): install(process.argv[3]);
     case ('-u'): uninstall(process.argv[3]);
     case ('-h'): return console.log("list of commands available for ew package manager:\n \n -r: reload package list\n -i: installs a package\n -u: uninstalls a package\n -pl: shows the list of packages that can be installed\n -h: prints list of commands\n");
     default: return console.log("list of commands available for ew package manager:\n \n -r: reload package list\n -i: installs a package\n -u: uninstalls a package\n -pl: shows the list of packages that can be installed\n -h: prints list of commands\n");
