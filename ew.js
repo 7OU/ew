@@ -36,79 +36,100 @@ function updatePackageList() {
 function install(package) {
     //check if the package arg exists
     if (!process.argv[3]) return console.log("Please specify a package to install.");
-
     const packageList = require("/etc/ew/packages.json");
-    let packageURL = packageList[package];
 
-    //check if its a valid package aswell..
-    if (!packageURL) return console.log("Invalid package specified, try doing sudo ew -r and see if it resolves the issue.");
-    process.stdout.write(`Downloading ${package}... `);
+    let packageNumberThingy = process.argv.length - 2;
+    let packagesInstalled = 0;
 
-    //use download-file module to store the archive of the package in tmp
-    download(packageURL, { directory: "/tmp", filename: `${package}.ew.tar.gz` }, function() {
-        targz.decompress({ src: `/tmp/${package}.ew.tar.gz`, dest: '/' }, function() {
-            //sometimes the archive may or may not exist here, so we should check first if it does.
-            if (fs.exists(`/tmp/${package}.ew.tar.gz`)) fs.unlink(`/tmp/${package}.ew.tar.gz`);
+    while (packagesInstalled <= packageNumberThingy) {
+
+        package = process.argv[packagesInstalled + 2];
+
+        let packageURL = packageList[package];
+
+        //check if its a valid package aswell..
+        if (!packageURL) return console.log("Invalid package specified, try doing sudo ew -r and see if it resolves the issue.");
+        process.stdout.write(`Downloading ${package}... `);
+
+        //use download-file module to store the archive of the package in tmp
+        download(packageURL, { directory: "/tmp", filename: `${package}.ew.tar.gz` }, function() {
+            targz.decompress({ src: `/tmp/${package}.ew.tar.gz`, dest: '/' }, function() {
+                //sometimes the archive may or may not exist here, so we should check first if it does.
+                if (fs.exists(`/tmp/${package}.ew.tar.gz`)) fs.unlink(`/tmp/${package}.ew.tar.gz`);
+            });
         });
-    });
-    //curl the package json file for future use
-    let jsond = download2(`https://ew.cumbox.best/packageInfo/${package}.json`);
+        //curl the package json file for future use
+        let jsond = download2(`https://ew.cumbox.best/packageInfo/${package}.json`);
 
-    //create and write the contents of the curl to the package json file
-    fs.writeFile(`/etc/ew/installed/${package}.json`, jsond);
+        //create and write the contents of the curl to the package json file
+        fs.writeFile(`/etc/ew/installed/${package}.json`, jsond);
 
-    process.stdout.write("done!\n");
-    process.stdout.write(`Successfully installed ${package}!\n`);
+        process.stdout.write("done!\n");
+        process.stdout.write(`Successfully installed ${package}!\n`);
 
-    //do some dependency checking
-    const json = require(`/etc/ew/installed/${package}.json`);
+        //do some dependency checking
+        const json = require(`/etc/ew/installed/${package}.json`);
 
-    //the name of the object key for dependencies is depends
-    if (json["depends"]) {
-        let dependscount = json.depends.length;
-        if (dependscount === 1) console.log("this package requires " + dependscount + " dependency, installing now...");
+        //the name of the object key for dependencies is depends
+        if (json["depends"]) {
+            let dependscount = json.depends.length;
+            if (dependscount === 1) console.log("this package requires " + dependscount + " dependency, installing now...");
 
-        else if (dependscount === 0) return console.log("Warning: json file has a depends field, but its empty.");
-        else console.log("this package requires" + dependscount + "dependencies");
+            else if (dependscount === 0) return console.log("Warning: json file has a depends field, but its empty.");
+            else console.log("this package requires" + dependscount + "dependencies");
 
-        //do a for loop to install the package
-        for (let dependencies = json.depends; dependscount > 0; dependscount--) {
-            dependencies = JSON.stringify(dependencies);
-            dependencies = dependencies.replace(/[\[\]"]/g, "");
+            //do a for loop to install the package
+            for (let dependencies = json.depends; dependscount > 0; dependscount--) {
+                dependencies = JSON.stringify(dependencies);
+                dependencies = dependencies.replace(/[\[\]"]/g, "");
 
-            //install the specified package after making it a valid string
-            install(dependencies);
+                //install the specified package after making it a valid string
+                install(dependencies);
+            }
         }
+
+        packagesInstalled++;
     }
 };
 
 function uninstall(package) {
     //check if a package to remove has been specified and return if it wasnt 
     if (!process.argv[3]) return console.log("Please specify a package to uninstall.");
-    process.stdout.write(`removing ${package}....`);
 
-    //check if the package json file is present, if not, the package does not exist.
-    if (!fs.exists(`/etc/ew/installed/${package}.json`)) return console.log("the specified package has already been removed or not installed.");
+    let packageNumberThingy = process.argv.length - 2;
+    let packagesInstalled = 0;
 
-    //load the json file to read the dirs to delete
-    let json = require(`/etc/ew/installed/${package}.json`);
+    while (packagesInstalled <= packageNumberThingy) {
 
-    //assign a letiable to the json object key named directoriesToDelete
-    //this is required for all packages.
-    let directories = json.directoriesToDelete;
-    let directorycount = directories.length;
+        package = process.argv[packagesInstalled + 2];
 
-    //for loop the removal of files
-    for (let file = directories; directorycount > 0; directorycount--) {
-        let newfile = JSON.stringify(file);
-        newfile = newfile.replace(/[\[\]"]/g, "");
-        fs.remove(newfile);
+        process.stdout.write(`removing ${package}....`);
+
+        //check if the package json file is present, if not, the package does not exist.
+        if (!fs.exists(`/etc/ew/installed/${package}.json`)) return console.log("the specified package has already been removed or not installed.");
+
+        //load the json file to read the dirs to delete
+        let json = require(`/etc/ew/installed/${package}.json`);
+
+        //assign a letiable to the json object key named directoriesToDelete
+        //this is required for all packages.
+        let directories = json.directoriesToDelete;
+        let directorycount = directories.length;
+
+        //for loop the removal of files
+        for (let file = directories; directorycount > 0; directorycount--) {
+            let newfile = JSON.stringify(file);
+            newfile = newfile.replace(/[\[\]"]/g, "");
+            fs.remove(newfile);
+        }
+
+        //after we are done, remove the json file
+        fs.unlink(`/etc/ew/installed/${package}.json`);
+        process.stdout.write(`done!\n`);
+        process.stdout.write(`Successfully  uninstalled ${package}!\n`);
+
+        packagesInstalled++;
     }
-
-    //after we are done, remove the json file
-    fs.unlink(`/etc/ew/installed/${package}.json`);
-    process.stdout.write(`done!\n`);
-    process.stdout.write(`Successfully  uninstalled ${package}!\n`);
 }
 
 function packagelist() {
@@ -117,7 +138,7 @@ function packagelist() {
 
     //print the number of packages available
     console.log(Object.keys(json).length + ' packages are available to be downloaded: ');
-    
+
     //print the package list
     console.log(Object.keys(json));
 }
