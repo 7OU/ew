@@ -13,6 +13,7 @@ if (!fs.existsSync("/etc/ew/packages.json")) {
     updatePackageList();
     fs.writeFileSync('/etc/ew/packages.json', '{}')
 };
+
 switch(process.argv[2]) {
     case ('-r'): updatePackageList();
     case (-'i'): install(process.argv[3]);
