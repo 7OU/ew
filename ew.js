@@ -33,8 +33,8 @@ function updatePackageList() {
 function install(package) {
     //check if the package arg exists
     if (!process.argv[3]) return console.log("Please specify a package to install.");
-    var packageList = require("/etc/ew/packages.json");
-    var packageURL = packageList[package];
+    const packageList = require("/etc/ew/packages.json");
+    let packageURL = packageList[package];
     //check if its a valid package aswell..
     if (!packageURL) return console.log("Invalid package specified, try doing sudo ew -r and see if it resolves the issue.");
     process.stdout.write(`Downloading ${package}... `);
@@ -77,7 +77,7 @@ function uninstall(package) {
     if (!fs.existsSync(`/etc/ew/installed/${package}.json`)) return console.log("the specified package has already been removed or not installed.");
     //load the json file to read the dirs to delete
     let json = require(`/etc/ew/installed/${package}.json`);
-    //assign a variable to the json object key named directoriesToDelete
+    //assign a letiable to the json object key named directoriesToDelete
     //this is required for all packages.
     let directories = json.directoriesToDelete;
     let directorycount = directories.length;
