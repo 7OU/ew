@@ -16,7 +16,7 @@ if (!fs.existsSync("/etc/ew/packages.json")) {
 if (process.argv[2] === '-r') updatePackageList();
 if (process.argv[2] === '-i') install(process.argv[3]);
 if (process.argv[2] === '-u') uninstall(process.argv[3]);
-if (process.argv[2] === '-h') help();
+if (process.argv[2] === '-h') return console.log("list of commands available for ew package manager:\n \n -r: reload package list\n -i: installs a package\n -u: uninstalls a package\n -pl: shows the list of packages that can be installed\n -h: prints list of commands\n");
 if (process.argv[2] === '-pl') packagelist();
 //if there is a lack of an argument for a function to use, simply just use the help func
 if (!process.argv[2]) help();
@@ -28,10 +28,6 @@ function updatePackageList() {
         process.stdout.write("Done!\n");
     });
 };
-
-function help() {
-    console.log("list of commands available for ew package manager:\n \n -r: reload package list\n -i: installs a package\n -u: uninstalls a package\n -pl: shows the list of packages that can be installed\n -h: prints list of commands\n");
-}
 
 function install(package) {
     //check if the package arg exists
