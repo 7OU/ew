@@ -17,19 +17,25 @@ if (!fs.exists("/etc/ew/packages.json")) {
     fs.writeFile('/etc/ew/packages.json', '{}')
 };
 
+
 switch (process.argv[2]) {
+    case ('reload'):
     case ('-r'):
         updatePackageList();
         break;
     case ('-i'):
+    case ('install'):
         install(process.argv[3]);
         break;
     case ('-u'):
+    case ('remove'):
         uninstall(process.argv[3]);
         break;
     case ('-h'):
+    case ('help'):
         return console.log("list of commands available for ew package manager:\n \n -r: reload package list\n -i: installs a package\n -u: uninstalls a package\n -pl: shows the list of packages that can be installed\n -h: prints list of commands\n");
     case ('-pl'):
+    case ('packagelist'):
         packagelist();
         break;
     default:
