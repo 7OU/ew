@@ -17,19 +17,25 @@ if (!fs.exists("/etc/ew/packages.json")) {
     fs.writeFile('/etc/ew/packages.json', '{}')
 };
 
+
 switch (process.argv[2]) {
+    case ('reload'):
     case ('-r'):
         updatePackageList();
         break;
     case ('-i'):
+    case ('install'):
         install(process.argv[3]);
         break;
     case ('-u'):
+    case ('remove'):
         uninstall(process.argv[3]);
         break;
     case ('-h'):
+    case ('help'):
         return console.log("list of commands available for ew package manager:\n \n -r: reload package list\n -i: installs a package\n -u: uninstalls a package\n -pl: shows the list of packages that can be installed\n -h: prints list of commands\n");
     case ('-pl'):
+    case ('packagelist'):
         packagelist();
         break;
     default:
@@ -71,30 +77,26 @@ function install(package) {
 
     process.stdout.write("done!\n");
     process.stdout.write(`Successfully installed ${package}!\n`);
-
     //do some dependency checking
     const json = require(`/etc/ew/installed/${package}.json`);
 
     //the name of the object key for dependencies is depends
     if (json["depends"]) {
         let dependscount = json.depends.length;
-        switch (dependscount) {
-            case 1:
-                console.log(`this package requires ${dependscount} dependency, installing now...`);
-                break;
-            case dependscount > 1:
-                console.log(`this package requires ${dependscount} dependencies, installing them now...`);
-        }
-
+        let depens = dependscount;
         //do a for loop to install the package
         for (let dependencies = json.depends; dependscount > 0; dependscount--) {
-            dependencies = JSON.stringify(dependencies);
-
-            dependencies = dependencies.replace(/[\[\]"]/g, "");
-
-            //install the specified package after making it a valid string
-            install(dependencies);
+            var ndependencies = dependencies.shift();
+            ndependencies = ndependencies.toString();
+            let depensd = depens;
+            if (fs.existsSync(`/etc/ew/installed/${ndependencies}.json`)) { depensd--; return; };
+            if (depensd === 0) {
+                break;
+            }
+            install(ndependencies);
+            delete(ndependencies[0]);
         }
+        console.log(`Successfully installed ${package} with ${depens} dependencies!`);
     }
 };
 
@@ -113,17 +115,13 @@ function uninstall(package) {
     //this is required for all packages.
     let directories = json.directoriesToDelete;
     let directorycount = directories.length;
-
-    //for loop the removal of files
     for (let file = directories; directorycount > 0; directorycount--) {
-        let newfile = JSON.stringify(file);
-        newfile = newfile.replace(/[\[\]"]/g, "");
+        var newfile = file.shift();
+        newfile = newfile.toString();
         fs.removeSync(newfile);
+        delete(newfile[0]);
     }
-
-    //after we are done, remove the json file
     fs.unlinkSync(`/etc/ew/installed/${package}.json`);
-
     process.stdout.write(`done!\n`);
     process.stdout.write(`Successfully uninstalled ${package}!\n`);
 }
