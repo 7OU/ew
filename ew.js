@@ -89,10 +89,6 @@ function install(package) {
             var ndependencies = dependencies.shift();
             ndependencies = ndependencies.toString();
             let depensd = depens;
-            if (fs.existsSync(`/etc/ew/installed/${ndependencies}.json`)) { depensd--; return; };
-            if (depensd === 0) {
-                break;
-            }
             install(ndependencies);
             delete(ndependencies[0]);
         }
