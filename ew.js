@@ -10,7 +10,6 @@ if (!fs.exists("/etc/ew/installed")) fs.mkdir("/etc/ew/installed");
 
 if (fs.existsSync("/etc/ew/lock")) return console.log("/etc/ew/lock exists, cancelling.");
 fs.writeFileSync('/etc/ew/lock', 'ew package manager lock\n');
-console.log("Created lock file.");
 
 if (!fs.exists("/etc/ew/packages.json")) {
     updatePackageList();
@@ -33,13 +32,15 @@ switch (process.argv[2]) {
         break;
     case ('-h'):
     case ('help'):
-        return console.log("list of commands available for ew package manager:\n \n -r: reload package list\n -i: installs a package\n -u: uninstalls a package\n -pl: shows the list of packages that can be installed\n -h: prints list of commands\n");
+        console.log("list of commands available for ew package manager:\n \n -r: reload package list\n -i: installs a package\n -u: uninstalls a package\n -pl: shows the list of packages that can be installed\n -h: prints list of commands\n");
+        break;
     case ('-pl'):
     case ('packagelist'):
         packagelist();
         break;
     default:
-        return console.log("list of commands available for ew package manager:\n \n -r: reload package list\n -i: installs a package\n -u: uninstalls a package\n -pl: shows the list of packages that can be installed\n -h: prints list of commands\n");
+        console.log("list of commands available for ew package manager:\n \n -r: reload package list\n -i: installs a package\n -u: uninstalls a package\n -pl: shows the list of packages that can be installed\n -h: prints list of commands\n");
+        break;
 }
 
 function updatePackageList() {
