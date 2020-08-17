@@ -86,8 +86,14 @@ function install(package) {
         let depens = dependscount;
         //do a for loop to install the package
         for (let dependencies = json.depends; dependscount > 0; dependscount--) {
+            //get the first result of the 
             var ndependencies = dependencies.shift();
             ndependencies = ndependencies.toString();
+            if (fs.existsSync(`/etc/ew/installed/${ndependencies}.json`)) {
+                console.log(`${ndependencies} is already installed!`);
+                delete(ndependencies[0]);
+                continue;
+            }
             let depensd = depens;
             install(ndependencies);
             delete(ndependencies[0]);
