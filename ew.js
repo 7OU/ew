@@ -8,9 +8,9 @@ if (!isRoot) return console.log("You must be root to excecute this command!");
 if (!fs.exists("/etc/ew")) fs.mkdir("/etc/ew");
 if (!fs.exists("/etc/ew/installed")) fs.mkdir("/etc/ew/installed");
 
-//if (fs.exists("/etc/ew/lock")) return console.log("/etc/ew/lock exists, cancelling.");
-//fs.writeFile('/etc/ew/lock', 'ew package manager lock\n');
-//console.log("Created lock file.");
+if (fs.existsSync("/etc/ew/lock")) return console.log("/etc/ew/lock exists, cancelling.");
+fs.writeFileSync('/etc/ew/lock', 'ew package manager lock\n');
+console.log("Created lock file.");
 
 if (!fs.exists("/etc/ew/packages.json")) {
     updatePackageList();
@@ -156,4 +156,4 @@ function packagelist() {
 
 }
 
-//fs.unlink('/etc/ew/lock');
+fs.unlink('/etc/ew/lock');
