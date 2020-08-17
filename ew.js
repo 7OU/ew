@@ -3,17 +3,23 @@ const fs = require('fs-extra');
 const download = require('download-file');
 const download2 = require('download-file-sync');
 const targz = require('targz');
+const { readFileSync } = require('fs-extra');
 
 if (!isRoot) return console.log("You must be root to excecute this command!");
-if (!fs.exists("/etc/ew")) fs.mkdir("/etc/ew");
-if (!fs.exists("/etc/ew/installed")) fs.mkdir("/etc/ew/installed");
-
+if (!fs.existsSync("/etc/ew")) fs.mkdirSync("/etc/ew");
+if (!fs.existsSync("/etc/ew/installed")) fs.mkdirSync("/etc/ew/installed");
+if (!fs.existsSync('/etc/ew/ewvers')) fs.writeFileSync('/etc/ew/ewvers', '0.2.7');
+let ewvers = download2('https://ewsite.mattstar45.repl.co/ewvers');
+let cewvers = readFileSync('/etc/ew/ewvers');
+if (ewvers != cewvers) {
+    console.log("******There is an update for ew available, do ew upgrade to update!******");
+}
 if (fs.existsSync("/etc/ew/lock")) return console.log("/etc/ew/lock exists, cancelling.");
 fs.writeFileSync('/etc/ew/lock', 'ew package manager lock\n');
 
-if (!fs.exists("/etc/ew/packages.json")) {
+if (!fs.existsSync("/etc/ew/packages.json")) {
     updatePackageList();
-    fs.writeFile('/etc/ew/packages.json', '{}')
+    fs.writeFileSync('/etc/ew/packages.json', '{}')
 };
 
 
@@ -30,16 +36,17 @@ switch (process.argv[2]) {
     case ('remove'):
         uninstall(process.argv[3]);
         break;
-    case ('-h'):
-    case ('help'):
-        console.log("list of commands available for ew package manager:\n \n -r: reload package list\n -i: installs a package\n -u: uninstalls a package\n -pl: shows the list of packages that can be installed\n -h: prints list of commands\n");
+    case ('upgrade'):
+        upgrade();
         break;
     case ('-pl'):
     case ('packagelist'):
         packagelist();
         break;
+    case ('-h'):
+    case ('help'):
     default:
-        console.log("list of commands available for ew package manager:\n \n -r: reload package list\n -i: installs a package\n -u: uninstalls a package\n -pl: shows the list of packages that can be installed\n -h: prints list of commands\n");
+        console.log("list of commands available for ew package manager:\n \n -r: reload package list\n upgrade: upgrade ewpm\n -i: installs a package\n -u: uninstalls a package\n -pl: shows the list of packages that can be installed\n -h: prints list of commands\n");
         break;
 }
 
@@ -140,7 +147,7 @@ function uninstall(package) {
         fs.removeSync(newfile);
         delete(newfile[0]);
     }
-    fs.unlinkSync(`/etc/ew/installed/${package}.json`);
+    fs.removeSync(`/etc/ew/installed/${package}.json`);
     process.stdout.write(`done!\n`);
     process.stdout.write(`Successfully uninstalled ${package}!\n`);
 }
@@ -157,4 +164,19 @@ function packagelist() {
 
 }
 
-fs.unlink('/etc/ew/lock');
+function upgrade() {
+    process.stdout.write("Upgrading ew.....");
+    download('https://ewsite.mattstar45.repl.co/packages/ewpm.ew.tar.gz', { directory: "/tmp", filename: "ewpm.ew.tar.gz", }, function() {
+        targz.decompress({ src: '/tmp/ewpm.ew.tar.gz', dest: '/' }, function() {
+            fs.removeSync('/tmp/ewpm.ew.tar.gz');
+        })
+    })
+    let jsond = download2('https://ew.cumbox.best/packageInfo/ewpm.json');
+    fs.writeFileSync('/etc/ew/installed/ewpm.json', jsond);
+    process.stdout.write("done!\n");
+    console.log('Successfully installed ewpm, writing version file...');
+    fs.writeFileSync('/etc/ew/ewvers', download2('https://ewsite.mattstar45.repl.co/ewvers'));
+    process.stdout.write('done!\n');
+    process.stdout.write("Successfully written version file!\n");
+}
+fs.removeSync('/etc/ew/lock');
