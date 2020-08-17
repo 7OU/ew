@@ -1,7 +1,7 @@
 const isRoot = process.getuid && process.getuid() === 0;
 const fs = require('fs-extra');
 const download = require('download-file');
-const download2 = require(`download-file-sync`);
+const download2 = require('download-file-sync');
 const targz = require('targz');
 
 if (!isRoot) return console.log("You must be root to excecute this command!");
