@@ -83,21 +83,37 @@ function install(package) {
     //the name of the object key for dependencies is depends
     if (json["depends"]) {
         let dependscount = json.depends.length;
+        switch (dependscount) {
+            case 1:
+                console.log(`this package requires ${dependscount} dependency, installing now...`);
+                break;
+            case dependscount > 1:
+                console.log(`this package requires ${dependscount} dependencies, installing them now...`);
+        }
         let depens = dependscount;
+
         //do a for loop to install the package
         for (let dependencies = json.depends; dependscount > 0; dependscount--) {
-            //get the first result of the 
+            //get the first result of the array and shift the next dependency to the first result
             var ndependencies = dependencies.shift();
+            //convert that object from the array into a single string
             ndependencies = ndependencies.toString();
+            //do a check to see if the package is already installed
+
             if (fs.existsSync(`/etc/ew/installed/${ndependencies}.json`)) {
                 console.log(`${ndependencies} is already installed!`);
+                //delete the object from the array
                 delete(ndependencies[0]);
+                //continue the for loop for the other dependencies
                 continue;
             }
-            let depensd = depens;
+
+            //install the dependency
             install(ndependencies);
+            //clear the array for another object 
             delete(ndependencies[0]);
         }
+
         console.log(`Successfully installed ${package} with ${depens} dependencies!`);
     }
 };
