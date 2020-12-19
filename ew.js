@@ -1,25 +1,17 @@
 const isRoot = process.getuid && process.getuid() === 0;
 const fs = require('fs-extra');
-const download = require('download-file');
-const download2 = require('download-file-sync');
 const targz = require('targz');
-const { readFileSync } = require('fs-extra');
+const http = require('https');
 
 if (!isRoot) return console.log("You must be root to excecute this command!");
 if (!fs.existsSync("/etc/ew")) fs.mkdirSync("/etc/ew");
 if (!fs.existsSync("/etc/ew/installed")) fs.mkdirSync("/etc/ew/installed");
-if (!fs.existsSync('/etc/ew/ewvers')) fs.writeFileSync('/etc/ew/ewvers', '0.2.7');
-let ewvers = download2('https://ewsite.mattstar45.repl.co/ewvers');
-let cewvers = readFileSync('/etc/ew/ewvers');
-if (ewvers != cewvers) {
-    console.log("******There is an update for ew available, do ew upgrade to update!******");
-}
 if (fs.existsSync("/etc/ew/lock")) return console.log("/etc/ew/lock exists, cancelling.");
+if (!fs.existsSync("/usr/bin/curl")) return console.log("could not find curl binary, exiting...");
 fs.writeFileSync('/etc/ew/lock', 'ew package manager lock\n');
 
 if (!fs.existsSync("/etc/ew/packages.json")) {
     updatePackageList();
-    fs.writeFileSync('/etc/ew/packages.json', '{}')
 };
 
 
@@ -36,12 +28,17 @@ switch (process.argv[2]) {
     case ('remove'):
         uninstall(process.argv[3]);
         break;
-    case ('upgrade'):
-        upgrade();
+    case ('check'):
+    case ('-c'):
+        upgrade(process.argv[3]);
         break;
     case ('-pl'):
     case ('packagelist'):
         packagelist();
+        break;
+    case ('-ipl'):
+    case ('installedlist'):
+        installdli();
         break;
     case ('-h'):
     case ('help'):
@@ -51,16 +48,12 @@ switch (process.argv[2]) {
 }
 
 function updatePackageList() {
-    process.stdout.write("Updating package list... ");
-    download("https://ew.cumbox.best/packages.json", { directory: "/etc/ew", filename: "packages.json" }, function(err) {
-        if (err) throw err;
-        process.stdout.write("Done!\n");
-    });
+    process.stdout.write("Updating package list...");
+    download("https://acetaminophen.me/ewsite/packages.json", '/etc/ew/', 'packages.json')
+    process.stdout.write('done!\n');
 };
 
 function install(package) {
-    //check if the package arg exists
-    if (!process.argv[3]) return console.log("Please specify a package to install.");
     const packageList = require("/etc/ew/packages.json");
 
     let packageURL = packageList[package];
@@ -70,19 +63,16 @@ function install(package) {
     process.stdout.write(`Downloading ${package}... `);
     //use download-file module to store the archive of the package in tmp
 
-    download(packageURL, { directory: "/tmp", filename: `${package}.ew.tar.gz` }, function() {
+    download(packageURL, '/tmp/', `${package}.ew.tar.gz`, function() {
         targz.decompress({ src: `/tmp/${package}.ew.tar.gz`, dest: '/' }, function() {
 
             //sometimes the archive may or may not exist here, so we should check first if it does.
             if (fs.existsSync(`/tmp/${package}.ew.tar.gz`)) fs.unlinkSync(`/tmp/${package}.ew.tar.gz`);
         });
     });
-    //curl the package json file for future use
-    let jsond = download2(`https://ew.cumbox.best/packageInfo/${package}.json`);
 
-    //create and write the contents of the curl to the package json file
-    fs.writeFileSync(`/etc/ew/installed/${package}.json`, jsond);
-
+    //download the package json file for future use
+    download(`https://acetaminophen.me/ewsite/packageInfo/${package}.json`, '/etc/ew/installed/', `${package}.json`);
     process.stdout.write("done!\n");
     process.stdout.write(`Successfully installed ${package}!\n`);
     //do some dependency checking
@@ -129,7 +119,7 @@ function install(package) {
 function uninstall(package) {
     //check if a package to remove has been specified and return if it wasnt 
     if (!process.argv[3]) return console.log("Please specify a package to uninstall.");
-    process.stdout.write(`removing ${package}....`);
+    process.stdout.write(`removing ${package}...`);
 
     //check if the package json file is present, if not, the package does not exist.
     if (!fs.existsSync(`/etc/ew/installed/${package}.json`)) return console.log("the specified package has already been removed or not installed.");
@@ -164,19 +154,11 @@ function packagelist() {
 
 }
 
-function upgrade() {
-    process.stdout.write("Upgrading ew.....");
-    download('https://ewsite.mattstar45.repl.co/packages/ewpm.ew.tar.gz', { directory: "/tmp", filename: "ewpm.ew.tar.gz", }, function() {
-        targz.decompress({ src: '/tmp/ewpm.ew.tar.gz', dest: '/' }, function() {
-            fs.removeSync('/tmp/ewpm.ew.tar.gz');
-        })
-    })
-    let jsond = download2('https://ew.cumbox.best/packageInfo/ewpm.json');
-    fs.writeFileSync('/etc/ew/installed/ewpm.json', jsond);
-    process.stdout.write("done!\n");
-    console.log('Successfully installed ewpm, writing version file...');
-    fs.writeFileSync('/etc/ew/ewvers', download2('https://ewsite.mattstar45.repl.co/ewvers'));
-    process.stdout.write('done!\n');
-    process.stdout.write("Successfully written version file!\n");
+function download(url, dir, filename) {
+    let download = require('child_process').execFileSync('curl', ['--silent', '-L', url], { encoding: 'utf8', maxBuffer: Infinity });
+    fs.writeFileSync(dir + filename, download);
+    //sometimes necessary, do it anyways as it doesn't matter
+    fs.chmod(dir + filename, 777);
+    return;
 }
 fs.removeSync('/etc/ew/lock');
