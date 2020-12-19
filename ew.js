@@ -14,7 +14,6 @@ if (!fs.existsSync("/etc/ew/packages.json")) {
     updatePackageList();
 };
 
-
 switch (process.argv[2]) {
     case ('reload'):
     case ('-r'):
@@ -28,17 +27,9 @@ switch (process.argv[2]) {
     case ('remove'):
         uninstall(process.argv[3]);
         break;
-    case ('check'):
-    case ('-c'):
-        upgrade(process.argv[3]);
-        break;
     case ('-pl'):
     case ('packagelist'):
         packagelist();
-        break;
-    case ('-ipl'):
-    case ('installedlist'):
-        installdli();
         break;
     case ('-h'):
     case ('help'):
@@ -159,6 +150,5 @@ function download(url, dir, filename) {
     fs.writeFileSync(dir + filename, download);
     //sometimes necessary, do it anyways as it doesn't matter
     fs.chmod(dir + filename, 777);
-    return;
 }
 fs.removeSync('/etc/ew/lock');
